@@ -28,14 +28,14 @@ const neighborhoods = [
     badge: null,
   },
   {
-    name: "Anglo Jos",
-    slug: "anglo-jos",
+    name: "Millionaires Quarters",
+    slug: "millionaires-quarters",
     description: "Schools, churches, and established residential calm.",
     badge: null,
   },
   {
-    name: "Dogon Dutse",
-    slug: "dogon-dutse",
+    name: "Federal Low Cost Housing",
+    slug: "federal-low-cost-housing",
     description: "Growing neighborhood with everyday essentials and local character.",
     badge: null,
   },
