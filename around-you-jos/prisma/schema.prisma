@@ -1,0 +1,83 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Neighborhood {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  businesses      Business[]
+  serviceRequests ServiceRequest[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  icon      String?
+  createdAt DateTime @default(now())
+
+  businesses Business[]
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  address     String
+  phone       String?
+  whatsapp    String?
+  email       String?
+  website     String?
+  isVerified  Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  neighborhoodId String
+  categoryId     String
+
+  neighborhood Neighborhood    @relation(fields: [neighborhoodId], references: [id])
+  category     Category        @relation(fields: [categoryId], references: [id])
+  images       BusinessImage[]
+}
+
+model BusinessImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model ServiceRequest {
+  id          String               @id @default(cuid())
+  name        String
+  phone       String
+  description String
+  status      ServiceRequestStatus @default(PENDING)
+  createdAt   DateTime             @default(now())
+
+  neighborhoodId String?
+  neighborhood   Neighborhood? @relation(fields: [neighborhoodId], references: [id])
+}
+
+enum ServiceRequestStatus {
+  PENDING
+  SEEN
+  RESOLVED
+}
