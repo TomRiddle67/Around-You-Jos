@@ -7,11 +7,6 @@ import { MapPin, Phone, MessageCircle, BadgeCheck, ArrowLeft } from "lucide-reac
 import Link from "next/link";
 import type { Metadata } from "next";
 
-/**
- * Dynamic metadata — each business page gets its own title and description.
- * This is critical for SEO. Google indexes each page individually.
- * "Tasty Bites | Around You Jos" is far better than "Business | Around You Jos"
- */
 export async function generateMetadata({
   params,
 }: {
@@ -19,13 +14,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const business = await getBusinessBySlug(slug);
-
   if (!business) return { title: "Business Not Found" };
-
-  return {
-    title: business.name,
-    description: business.description,
-  };
+  return { title: business.name, description: business.description };
 }
 
 export default async function BusinessDetailPage({
@@ -35,52 +25,55 @@ export default async function BusinessDetailPage({
 }) {
   const { slug } = await params;
   const business = await getBusinessBySlug(slug);
-
-  /**
-   * notFound() is a Next.js function that renders the nearest not-found.tsx.
-   * Always handle missing data explicitly — never let a null crash your page.
-   */
   if (!business) notFound();
 
   return (
     <>
       <Navbar />
       <main>
-        {/* Back link */}
-        <div className="bg-white border-b border-neutral-200">
-          <Container className="py-3">
-            <Link
-              href="/businesses"
-              className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              All businesses
-            </Link>
-          </Container>
+        <div
+          className="text-xs px-4 py-1 flex items-center gap-2"
+          style={{ background: "var(--green-dark)", color: "rgba(255,255,255,0.65)" }}
+        >
+          <Link href="/businesses" style={{ color: "rgba(255,255,255,0.65)" }}>Businesses</Link>
+          <span>›</span>
+          <span>{business.neighborhood.name}</span>
+          <span>›</span>
+          <span style={{ color: "rgba(255,255,255,0.9)" }}>{business.name}</span>
         </div>
 
-        {/* Hero */}
-        <div className="bg-neutral-900 py-12">
+        <div className="py-3" style={{ background: "var(--bg-surface)", borderBottom: "1px solid var(--border)" }}>
           <Container>
-            <div className="flex items-start justify-between gap-6">
+            <Link
+              href="/businesses"
+              className="inline-flex items-center gap-1.5 text-xs mb-2"
+              style={{ color: "var(--fg-muted)" }}
+            >
+              <ArrowLeft className="h-3 w-3" /> Back to businesses
+            </Link>
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wide text-green-400 mb-2 block">
-                  {business.category.name}
-                </span>
-                <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+                <h1 className="text-lg font-bold flex items-center gap-2" style={{ color: "var(--fg)" }}>
                   {business.name}
                   {business.isVerified && (
-                    <BadgeCheck className="h-6 w-6 text-green-400" />
+                    <BadgeCheck className="h-4 w-4" style={{ color: "var(--green)" }} />
                   )}
                 </h1>
-                <span className="inline-flex items-center gap-1.5 text-sm text-neutral-400">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {business.neighborhood.name}, Jos
-                </span>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--green)" }}>
+                    {business.category.name}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "var(--fg-muted)" }}>
+                    <MapPin className="h-3 w-3" />
+                    {business.neighborhood.name}, Jos
+                  </span>
+                </div>
               </div>
-
               {business.isFeatured && (
-                <span className="px-3 py-1 text-xs font-semibold bg-green-500 text-white rounded-full flex-shrink-0">
+                <span
+                  className="text-xs font-semibold px-2 py-0.5 rounded-sm shrink-0"
+                  style={{ background: "var(--green-bg)", color: "var(--green-text)" }}
+                >
                   Featured
                 </span>
               )}
@@ -88,96 +81,99 @@ export default async function BusinessDetailPage({
           </Container>
         </div>
 
-        {/* Content */}
-        <section className="py-10 bg-neutral-50">
-          <Container>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-              {/* Main content */}
-              <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white rounded-2xl border border-neutral-200 p-6">
-                  <h2 className="text-base font-bold text-neutral-900 mb-3">
-                    About
-                  </h2>
-                  <p className="text-sm text-neutral-600 leading-relaxed">
-                    {business.description}
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-2xl border border-neutral-200 p-6">
-                  <h2 className="text-base font-bold text-neutral-900 mb-3">
-                    Location
-                  </h2>
-                  <p className="text-sm text-neutral-600 flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-neutral-400 mt-0.5 flex-shrink-0" />
-                    {business.address}
-                  </p>
-                </div>
-              </div>
-
-              {/* Sidebar — contact */}
-              <div className="space-y-4">
-                <div className="bg-white rounded-2xl border border-neutral-200 p-5">
-                  <h2 className="text-sm font-bold text-neutral-900 mb-4">
-                    Contact
-                  </h2>
-                  <div className="space-y-3">
-                    {business.phone && (
-                    <a 
-                        href={`tel:${business.phone}`}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100 transition-colors"
-                      >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-200">
-                          <Phone className="h-4 w-4 text-neutral-600" />
-                        </span>
-                        <div>
-                          <p className="text-xs text-neutral-400">Phone</p>
-                          <p className="text-sm font-medium text-neutral-900">
-                            {business.phone}
-                          </p>
-                        </div>
-                      </a>
-                    )}
-
-                    {business.whatsapp && (
-                    <a  
-                        href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 rounded-xl bg-green-50 hover:bg-green-100 transition-colors"
-                      >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-200">
-                          <MessageCircle className="h-4 w-4 text-green-700" />
-                        </span>
-                        <div>
-                          <p className="text-xs text-green-600">WhatsApp</p>
-                          <p className="text-sm font-medium text-green-900">
-                            Message on WhatsApp
-                          </p>
-                        </div>
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                {/* Neighborhood link */}
-                <Link
-                  href={`/neighborhoods/${business.neighborhood.slug}`}
-                  className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-neutral-200 hover:border-green-200 transition-colors"
-                >
-                  <MapPin className="h-4 w-4 text-green-600" />
-                  <div>
-                    <p className="text-xs text-neutral-400">Neighborhood</p>
-                    <p className="text-sm font-medium text-neutral-900">
-                      Around {business.neighborhood.name}
-                    </p>
-                  </div>
-                </Link>
-              </div>
-
+        <div className="flex" style={{ borderBottom: "1px solid var(--border)" }}>
+          <aside
+            className="hidden md:block shrink-0 p-4"
+            style={{ width: 240, borderRight: "1px solid var(--border)", background: "var(--bg-surface)" }}
+          >
+            <div
+              className="text-xs font-semibold uppercase tracking-widest mb-2 pb-1.5"
+              style={{ color: "var(--fg-muted)", borderBottom: "0.5px solid var(--border)" }}
+            >
+              Contact
             </div>
-          </Container>
-        </section>
+
+            {business.phone && (
+              
+                href={`tel:${business.phone}`}
+                className="flex items-center gap-2 py-2 text-sm"
+                style={{ color: "var(--fg)", borderBottom: "0.5px solid var(--border)" }}
+              >
+                <Phone className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--fg-muted)" }} />
+                <div>
+                  <div className="text-xs" style={{ color: "var(--fg-muted)" }}>Phone</div>
+                  <div className="text-sm font-medium" style={{ color: "var(--fg)" }}>{business.phone}</div>
+                </div>
+              </a>
+            )}
+
+            {business.whatsapp && (
+              
+                href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 py-2 text-sm"
+                style={{ color: "var(--fg)", borderBottom: "0.5px solid var(--border)" }}
+              >
+                <MessageCircle className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--green)" }} />
+                <div>
+                  <div className="text-xs" style={{ color: "var(--fg-muted)" }}>WhatsApp</div>
+                  <div className="text-sm font-medium" style={{ color: "var(--green)" }}>Message on WhatsApp</div>
+                </div>
+              </a>
+            )}
+
+            <div style={{ height: "0.5px", background: "var(--border)", margin: "8px 0" }} />
+
+            <div
+              className="text-xs font-semibold uppercase tracking-widest mb-2 pb-1.5"
+              style={{ color: "var(--fg-muted)", borderBottom: "0.5px solid var(--border)" }}
+            >
+              Neighborhood
+            </div>
+            <Link
+              href={`/neighborhoods/${business.neighborhood.slug}`}
+              className="flex items-center gap-2 py-1 text-sm"
+              style={{ color: "var(--green)" }}
+            >
+              <MapPin className="h-3.5 w-3.5" />
+              Around {business.neighborhood.name}
+            </Link>
+          </aside>
+
+          <div className="flex-1 p-5" style={{ background: "var(--bg)" }}>
+            <div
+              className="mb-4 p-4 rounded-sm"
+              style={{ background: "var(--bg-surface)", border: "0.5px solid var(--border)" }}
+            >
+              <h2
+                className="text-xs font-semibold uppercase tracking-widest mb-2 pb-1.5"
+                style={{ color: "var(--fg-muted)", borderBottom: "0.5px solid var(--border)" }}
+              >
+                About
+              </h2>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--fg)" }}>
+                {business.description}
+              </p>
+            </div>
+
+            <div
+              className="p-4 rounded-sm"
+              style={{ background: "var(--bg-surface)", border: "0.5px solid var(--border)" }}
+            >
+              <h2
+                className="text-xs font-semibold uppercase tracking-widest mb-2 pb-1.5"
+                style={{ color: "var(--fg-muted)", borderBottom: "0.5px solid var(--border)" }}
+              >
+                Location
+              </h2>
+              <p className="text-sm flex items-start gap-2" style={{ color: "var(--fg)" }}>
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "var(--fg-muted)" }} />
+                {business.address}
+              </p>
+            </div>
+          </div>
+        </div>
       </main>
       <Footer />
     </>
