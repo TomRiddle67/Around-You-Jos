@@ -58,7 +58,7 @@ export default async function BusinessesPage() {
               <span className="text-xs font-semibold whitespace-nowrap" style={{ color: "var(--fg-muted)" }}>
                 Filter:
               </span>
-              {categories.map((cat) => (
+              {categories.map((cat: { id: string; name: string; slug: string }) => (
                 <span
                   key={cat.id}
                   className="px-2.5 py-1 text-xs cursor-pointer whitespace-nowrap rounded-sm transition-colors"
@@ -93,7 +93,7 @@ export default async function BusinessesPage() {
             >
               Neighborhoods
             </div>
-            {neighborhoods.map((n) => (
+            {neighborhoods.map((n: { id: string; name: string; slug: string }) => (
               <a
                 key={n.id}
                 className="flex items-center justify-between px-3 py-1 text-sm cursor-pointer transition-colors"
