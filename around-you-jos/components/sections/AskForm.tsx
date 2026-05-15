@@ -4,9 +4,12 @@ import { useActionState } from "react";
 import { submitRequestAction } from "@/app/ask/actions";
 import { MapPin, Phone, MessageSquare, User, Loader2 } from "lucide-react";
 
+type FormErrors = Record<string, string[]>;
+
 type ActionResult =
   | { success: true;  message: string }
-  | { success: false; errors?: Record<string, string[]>; message?: string }
+  | { success: false; errors: FormErrors }
+  | { success: false; message: string }
   | null;
 
 interface AskFormProps {
@@ -19,9 +22,19 @@ const inputStyle = {
   color: "var(--fg)",
 };
 
-const labelStyle = {
-  color: "var(--fg-muted)",
-};
+const labelStyle = { color: "var(--fg-muted)" };
+
+function getErrors(state: ActionResult): FormErrors | null {
+  if (!state || state.success) return null;
+  if ("errors" in state) return state.errors;
+  return null;
+}
+
+function getGlobalMessage(state: ActionResult): string | null {
+  if (!state || state.success) return null;
+  if ("message" in state) return state.message;
+  return null;
+}
 
 export function AskForm({ neighborhoods }: AskFormProps) {
   const [state, formAction, isPending] = useActionState(
@@ -29,10 +42,14 @@ export function AskForm({ neighborhoods }: AskFormProps) {
     null
   );
 
+  const errors = getErrors(state);
+  const globalMessage = getGlobalMessage(state);
+
   if (state?.success) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex h-14 w-14 items-center justify-center rounded-full mb-4"
+        <div
+          className="inline-flex h-14 w-14 items-center justify-center rounded-full mb-4"
           style={{ background: "var(--green-bg)" }}
         >
           <svg className="h-7 w-7" style={{ color: "var(--green)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,11 +71,12 @@ export function AskForm({ neighborhoods }: AskFormProps) {
 
   return (
     <form action={formAction} className="space-y-5">
-      {state && !state.success && state.message && (
-        <div className="p-3 rounded-lg text-sm"
+      {globalMessage && (
+        <div
+          className="p-3 rounded-lg text-sm"
           style={{ background: "#fef2f2", border: "0.5px solid #fecaca", color: "#dc2626" }}
         >
-          {state.message}
+          {globalMessage}
         </div>
       )}
 
@@ -76,8 +94,8 @@ export function AskForm({ neighborhoods }: AskFormProps) {
             style={inputStyle}
           />
         </div>
-        {!state?.success && state?.errors?.name && (
-          <p className="mt-1 text-xs" style={{ color: "#dc2626" }}>{state.errors.name[0]}</p>
+        {errors?.name && (
+          <p className="mt-1 text-xs" style={{ color: "#dc2626" }}>{errors.name[0]}</p>
         )}
       </div>
 
@@ -95,8 +113,8 @@ export function AskForm({ neighborhoods }: AskFormProps) {
             style={inputStyle}
           />
         </div>
-        {!state?.success && state?.errors?.phone && (
-          <p className="mt-1 text-xs" style={{ color: "#dc2626" }}>{state.errors.phone[0]}</p>
+        {errors?.phone && (
+          <p className="mt-1 text-xs" style={{ color: "#dc2626" }}>{errors.phone[0]}</p>
         )}
       </div>
 
@@ -133,8 +151,8 @@ export function AskForm({ neighborhoods }: AskFormProps) {
             style={inputStyle}
           />
         </div>
-        {!state?.success && state?.errors?.description && (
-          <p className="mt-1 text-xs" style={{ color: "#dc2626" }}>{state.errors.description[0]}</p>
+        {errors?.description && (
+          <p className="mt-1 text-xs" style={{ color: "#dc2626" }}>{errors.description[0]}</p>
         )}
       </div>
 
