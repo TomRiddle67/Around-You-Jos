@@ -11,31 +11,29 @@ export const metadata: Metadata = {
 };
 
 export default async function AskPage() {
-  // Server Component fetches neighborhoods for the dropdown
-  // The form receives them as props — clean data flow
   const neighborhoods = await getNeighborhoods();
 
   return (
     <>
       <Navbar />
       <main>
-        <section className="bg-neutral-900 py-12">
+        <section style={{ background: "var(--green-dark)", borderBottom: "1px solid var(--border)" }} className="py-10">
           <Container size="narrow">
-            <p className="text-xs font-semibold tracking-widest uppercase text-green-400 mb-2">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "var(--green)" }}>
               Ask Around You
             </p>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: "#ffffff" }}>
               Need something around Jos?
             </h1>
-            <p className="text-neutral-400 text-sm">
-              Tell us what you need and we'll help you find the right place or person.
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>
+              Tell us what you need and we&apos;ll help you find the right place or person.
             </p>
           </Container>
         </section>
 
-        <section className="py-12 bg-neutral-50">
+        <section className="py-10" style={{ background: "var(--bg)" }}>
           <Container size="narrow">
-            <div className="bg-white rounded-2xl border border-neutral-200 p-6 md:p-8">
+            <div className="rounded-xl p-6 md:p-8" style={{ background: "var(--bg-surface)", border: "0.5px solid var(--border)" }}>
               <AskForm neighborhoods={neighborhoods} />
             </div>
           </Container>
