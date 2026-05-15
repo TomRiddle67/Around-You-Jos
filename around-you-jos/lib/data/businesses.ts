@@ -65,3 +65,8 @@ export async function getNeighborhoods() {
     orderBy: { name: "asc" },
   });
 }
+export async function getNeighborhoodBySlug(slug: string) {
+  return prisma.neighborhood.findUnique({
+    where: { slug },
+  });
+}

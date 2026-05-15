@@ -1,13 +1,16 @@
-// around-you-jos/components/sections/StatBar.tsx
+interface StatBarProps {
+  businessCount: number;
+  neighborhoodCount: number;
+}
 
-const stats = [
-  { value: "120+",   label: "businesses" },
-  { value: "14",     label: "neighborhoods" },
-  { value: "300+",   label: "trusted picks" },
-  { value: "2,400+", label: "people helped" },
-];
+export function StatBar({ businessCount, neighborhoodCount }: StatBarProps) {
+  const stats = [
+    { value: `${businessCount}`,   label: "businesses" },
+    { value: `${neighborhoodCount}`, label: "neighborhoods" },
+    { value: "300+",               label: "trusted picks" },
+    { value: "2,400+",             label: "people helped" },
+  ];
 
-export function StatBar() {
   return (
     <div
       className="flex"
