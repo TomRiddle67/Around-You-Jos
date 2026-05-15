@@ -94,7 +94,7 @@ export default async function BusinessDetailPage({
             </div>
 
             {business.phone && (
-              
+              <a
                 href={`tel:${business.phone}`}
                 className="flex items-center gap-2 py-2 text-sm"
                 style={{ color: "var(--fg)", borderBottom: "0.5px solid var(--border)" }}
@@ -109,7 +109,7 @@ export default async function BusinessDetailPage({
 
             {business.whatsapp && (
               
-                href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`}
+              <a  href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 py-2 text-sm"
