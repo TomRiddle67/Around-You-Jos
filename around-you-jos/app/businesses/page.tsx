@@ -4,6 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { getBusinesses, getCategories, getNeighborhoods } from "@/lib/data/businesses";
 import type { Metadata } from "next";
+import type { BusinessSummary } from "@/types";
 
 type Item = { id: string; name: string; slug: string };
 
@@ -96,7 +97,7 @@ export default async function BusinessesPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "var(--border)" }}>
-                {businesses.map((business) => (
+                {businesses.map((business: BusinessSummary) => (
                   <BusinessCard key={business.id} business={business} />
                 ))}
               </div>
