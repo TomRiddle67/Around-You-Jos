@@ -1,5 +1,3 @@
-// around-you-jos/components/sections/PostsList.tsx
-
 const posts = [
   {
     category: "Services",
@@ -41,34 +39,29 @@ const posts = [
 export function PostsList() {
   return (
     <div>
-      {posts.map((post, i) => (
+      {posts.map((post: { category: string; catStyle: Record<string, string>; title: string; description: string; date: string }, i: number) => (
         <div
           key={i}
-          className="grid gap-2 py-2 cursor-pointer"
+          className="flex gap-3 py-2 cursor-pointer items-start"
           style={{
-            gridTemplateColumns: "64px 1fr auto",
-            alignItems: "start",
             borderBottom: i < posts.length - 1 ? "0.5px solid var(--border)" : "none",
           }}
         >
           <span
-            className="text-xs font-semibold px-1.5 py-0.5 rounded-sm"
-            style={{ ...post.catStyle, letterSpacing: "0.04em" }}
+            className="shrink-0 text-xs font-semibold px-1.5 py-0.5 rounded-sm"
+            style={{ ...post.catStyle, whiteSpace: "nowrap", letterSpacing: "0.04em", minWidth: 64, textAlign: "center" }}
           >
             {post.category}
           </span>
-          <div>
-            <div
-              className="text-sm leading-snug mb-0.5"
-              style={{ color: "var(--fg)" }}
-            >
+          <div className="flex-1 min-w-0">
+            <div className="text-sm leading-snug mb-0.5 truncate" style={{ color: "var(--fg)" }}>
               {post.title}
             </div>
             <div className="text-xs" style={{ color: "var(--fg-muted)" }}>
               {post.description}
             </div>
           </div>
-          <span className="text-xs whitespace-nowrap" style={{ color: "var(--fg-subtle)" }}>
+          <span className="text-xs whitespace-nowrap shrink-0" style={{ color: "var(--fg-subtle)" }}>
             {post.date}
           </span>
         </div>
