@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { SanityPost } from "@/sanity/queries";
 import { PostsList } from "./PostsList";
 
 interface Neighborhood {
@@ -17,6 +18,7 @@ interface Category {
 interface NeighborhoodCardsProps {
   neighborhoods: Neighborhood[];
   categories: Category[];
+  posts: SanityPost[];
 }
 
 const trustedPicks = [
@@ -51,7 +53,7 @@ function SectionHeader({ title, href }: { title: string; href: string }) {
   );
 }
 
-export function NeighborhoodCards({ neighborhoods, categories }: NeighborhoodCardsProps) {
+export function NeighborhoodCards({ neighborhoods, categories, posts }: NeighborhoodCardsProps) {
   return (
     <div className="flex" style={{ borderBottom: "1px solid var(--border)", minHeight: "60vh" }}>
 
@@ -156,7 +158,7 @@ export function NeighborhoodCards({ neighborhoods, categories }: NeighborhoodCar
         {/* Posts list */}
         <div className="mb-5">
           <SectionHeader title="Useful now — local guides and places" href="/blog" />
-          <PostsList />
+          <PostsList posts={posts} />
         </div>
 
         {/* Trusted picks */}

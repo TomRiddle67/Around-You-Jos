@@ -4,12 +4,14 @@ import { StatBar } from "@/components/sections/StatBar";
 import { NeighborhoodCards } from "@/components/sections/NeighborhoodCards";
 import { Footer } from "@/components/layout/Footer";
 import { getNeighborhoods, getCategories, getBusinesses } from "@/lib/data/businesses";
+import { getRecentPosts } from "@/sanity/queries";
 
 export default async function HomePage() {
-  const [neighborhoods, categories, businesses] = await Promise.all([
+  const [neighborhoods, categories, businesses, posts] = await Promise.all([
     getNeighborhoods(),
     getCategories(),
     getBusinesses(),
+    getRecentPosts(5),
   ]);
 
   return (
@@ -23,6 +25,7 @@ export default async function HomePage() {
       <NeighborhoodCards
         neighborhoods={neighborhoods}
         categories={categories}
+        posts={posts}
       />
       <Footer />
     </>
