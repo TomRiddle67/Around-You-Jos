@@ -1,5 +1,4 @@
-// around-you-jos/lib/prisma.ts
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../node_modules/.prisma/client/default.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as unknown as {
@@ -8,7 +7,7 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("DATABASE_URL is not set in .env.local");
+  if (!connectionString) throw new Error("DATABASE_URL environment variable is not set");
 
   const adapter = new PrismaPg({ connectionString });
 
