@@ -7,6 +7,7 @@ import { getNeighborhoodBySlug, getBusinesses, getCategories } from "@/lib/data/
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import type { BusinessSummary } from "@/types";
 
 export async function generateMetadata({
   params,
@@ -91,7 +92,7 @@ export default async function NeighborhoodPage({
             >
               All categories
             </Link>
-            {categories.map((c) => (
+            {categories.map((c: { id: string; name: string; slug: string }) => (
               <a
                 key={c.id}
                 className="flex items-center justify-between px-3 py-1 text-sm cursor-pointer"
@@ -129,7 +130,7 @@ export default async function NeighborhoodPage({
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px"
                 style={{ background: "var(--border)" }}
               >
-                {businesses.map((business) => (
+                {businesses.map((business: BusinessSummary) => (
                   <BusinessCard key={business.id} business={business} />
                 ))}
               </div>

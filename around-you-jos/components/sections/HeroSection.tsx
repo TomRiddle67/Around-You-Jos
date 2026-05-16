@@ -57,7 +57,7 @@ export function HeroSection() {
           {/* Quick tags */}
           <div className="flex flex-wrap gap-1.5 text-xs">
             <span style={{ color: "var(--fg-subtle)" }} className="mr-1">Popular:</span>
-            {quickTags.map((tag) => (
+            {quickTags.map((tag: string) => (
               <span
                 key={tag}
                 className="px-2 py-0.5 rounded-sm cursor-pointer transition-colors"

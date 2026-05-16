@@ -5,6 +5,8 @@ import { getNeighborhoods } from "@/lib/data/businesses";
 import Link from "next/link";
 import type { Metadata } from "next";
 
+type NeighborhoodItem = { id: string; name: string; slug: string; description: string | null };
+
 export const metadata: Metadata = {
   title: "Neighborhoods",
   description: "Explore local businesses and services by neighborhood in Jos, Nigeria.",
@@ -41,7 +43,7 @@ export default async function NeighborhoodsPage() {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px"
               style={{ background: "var(--border)" }}
             >
-              {neighborhoods.map((n) => (
+              {neighborhoods.map((n: NeighborhoodItem) => (
                 <Link
                   key={n.slug}
                   href={`/neighborhoods/${n.slug}`}

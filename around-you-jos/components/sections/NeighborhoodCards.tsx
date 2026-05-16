@@ -61,7 +61,7 @@ export function NeighborhoodCards({ neighborhoods, categories }: NeighborhoodCar
         style={{ width: 200, borderRight: "1px solid var(--border)", background: "var(--bg-surface)" }}
       >
         <SidebarSection title="Neighborhoods">
-          {neighborhoods.map((n) => (
+          {neighborhoods.map((n: { id: string; name: string; slug: string; description: string | null }) => (
             <Link
               key={n.slug}
               href={`/neighborhoods/${n.slug}`}
@@ -79,7 +79,7 @@ export function NeighborhoodCards({ neighborhoods, categories }: NeighborhoodCar
         <div style={{ height: "0.5px", background: "var(--border)", margin: "6px 0" }} />
 
         <SidebarSection title="Categories">
-          {categories.map((c) => (
+          {categories.map((c: { id: string; name: string; slug: string }) => (
             <Link
               key={c.slug}
               href={`/businesses?category=${c.slug}`}
@@ -97,7 +97,7 @@ export function NeighborhoodCards({ neighborhoods, categories }: NeighborhoodCar
         <div style={{ height: "0.5px", background: "var(--border)", margin: "6px 0" }} />
 
         <SidebarSection title="Quick links">
-          {["Featured businesses", "Recently added", "Local guides", "Trusted picks"].map((label) => (
+          {["Featured businesses", "Recently added", "Local guides", "Trusted picks"].map((label: string) => (
             <a key={label} className="block px-3 py-1 text-sm cursor-pointer" style={{ color: "var(--fg)" }}>
               {label}
             </a>
@@ -134,7 +134,7 @@ export function NeighborhoodCards({ neighborhoods, categories }: NeighborhoodCar
         <div className="mb-5">
           <SectionHeader title="Explore by neighborhood" href="/neighborhoods" />
           <div className="grid grid-cols-2 gap-px" style={{ background: "var(--border)" }}>
-            {neighborhoods.map((n) => (
+            {neighborhoods.map((n: { id: string; name: string; slug: string; description: string | null }) => (
               <Link
                 key={n.slug}
                 href={`/neighborhoods/${n.slug}`}

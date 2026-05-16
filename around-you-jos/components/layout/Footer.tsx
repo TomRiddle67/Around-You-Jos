@@ -31,7 +31,7 @@ export function Footer() {
               { label: "Businesses",    href: "/businesses" },
               { label: "Blog",          href: "/blog" },
               { label: "Need Something?", href: "/ask" },
-            ].map((link) => (
+            ].map((link: { label: string; href: string }) => (
               <Link key={link.href} href={link.href}
                 className="transition-colors hover:underline"
                 style={{ color: "var(--fg-muted)" }}

@@ -29,7 +29,7 @@ export function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {navLinks.map((link: { label: string; href: string }) => (
               <Link
                 key={link.href}
                 href={link.href}

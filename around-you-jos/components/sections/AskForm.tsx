@@ -130,7 +130,7 @@ export function AskForm({ neighborhoods }: AskFormProps) {
             style={inputStyle}
           >
             <option value="">Any area in Jos</option>
-            {neighborhoods.map((n) => (
+            {neighborhoods.map((n: { id: string; name: string }) => (
               <option key={n.id} value={n.id}>{n.name}</option>
             ))}
           </select>
