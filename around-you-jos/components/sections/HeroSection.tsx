@@ -1,7 +1,6 @@
-// around-you-jos/components/sections/HeroSection.tsx
-import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { Search } from "lucide-react";
+import Link from "next/link";
 
 const quickTags = [
   "Print documents", "Food near me", "Phone repair",
@@ -11,7 +10,6 @@ const quickTags = [
 export function HeroSection() {
   return (
     <>
-      {/* Topbar */}
       <div
         className="text-xs px-4 py-1 flex items-center justify-between"
         style={{ background: "var(--green-dark)", color: "rgba(255,255,255,0.65)" }}
@@ -23,13 +21,12 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Search */}
       <div
         className="py-4"
         style={{ background: "var(--bg-surface)", borderBottom: "1px solid var(--border)" }}
       >
         <Container>
-          <div className="flex gap-2 mb-2">
+          <form method="GET" action="/search" className="flex gap-2 mb-2">
             <div className="relative flex-1">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
@@ -37,6 +34,7 @@ export function HeroSection() {
               />
               <input
                 type="text"
+                name="q"
                 placeholder="What do you need today? e.g. printer near Farin Gada, tailor in Rayfield..."
                 className="w-full h-9 pl-9 pr-4 text-sm rounded-sm outline-none"
                 style={{
@@ -47,19 +45,20 @@ export function HeroSection() {
               />
             </div>
             <button
+              type="submit"
               className="h-9 px-4 text-sm font-medium text-white rounded-sm whitespace-nowrap"
               style={{ background: "var(--green)" }}
             >
               Search Jos
             </button>
-          </div>
+          </form>
 
-          {/* Quick tags */}
           <div className="flex flex-wrap gap-1.5 text-xs">
             <span style={{ color: "var(--fg-subtle)" }} className="mr-1">Popular:</span>
             {quickTags.map((tag: string) => (
-              <span
+              <Link
                 key={tag}
+                href={`/search?q=${encodeURIComponent(tag)}`}
                 className="px-2 py-0.5 rounded-sm cursor-pointer transition-colors"
                 style={{
                   border: "0.5px solid var(--green)",
@@ -67,7 +66,7 @@ export function HeroSection() {
                 }}
               >
                 {tag}
-              </span>
+              </Link>
             ))}
           </div>
         </Container>

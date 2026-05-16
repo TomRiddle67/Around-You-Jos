@@ -70,3 +70,43 @@ export async function getNeighborhoodBySlug(slug: string) {
     where: { slug },
   });
 }
+
+export async function searchBusinesses(query: string) {
+  if (!query || query.trim().length < 2) return { businesses: [], neighborhoods: [] };
+
+  const term = query.trim();
+
+  const [businesses, neighborhoods] = await Promise.all([
+    prisma.business.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { name:        { contains: term, mode: "insensitive" } },
+          { description: { contains: term, mode: "insensitive" } },
+          { address:     { contains: term, mode: "insensitive" } },
+          { category:    { name: { contains: term, mode: "insensitive" } } },
+          { neighborhood:{ name: { contains: term, mode: "insensitive" } } },
+        ],
+      },
+      include: {
+        neighborhood: { select: { name: true, slug: true } },
+        category:     { select: { name: true, slug: true, icon: true } },
+        images:       { where: { isPrimary: true }, take: 1 },
+      },
+      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      take: 20,
+    }),
+
+    prisma.neighborhood.findMany({
+      where: {
+        OR: [
+          { name:        { contains: term, mode: "insensitive" } },
+          { description: { contains: term, mode: "insensitive" } },
+        ],
+      },
+      take: 5,
+    }),
+  ]);
+
+  return { businesses, neighborhoods };
+}
