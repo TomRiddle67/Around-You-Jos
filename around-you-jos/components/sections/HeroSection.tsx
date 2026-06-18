@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const quickTags = [
   "Print documents", "Food near me", "Phone repair",
-  "Reliable tailor", "Mechanic", "Groceries", "Hotel", "Pharmacy",
+  "Reliable tailor", "Mechanic", "Groceries", "Pharmacy",
 ];
 
 export function HeroSection() {
@@ -14,7 +14,7 @@ export function HeroSection() {
         className="text-xs px-4 py-1 flex items-center justify-between"
         style={{ background: "var(--green-dark)", color: "rgba(255,255,255,0.65)" }}
       >
-        <span>Jos, Plateau State, Nigeria — your practical local guide</span>
+        <span>Now live in Millionaires Quarters, Jos — more neighborhoods coming soon</span>
         <div className="hidden sm:flex gap-3">
           <Link href="/businesses" style={{ color: "rgba(255,255,255,0.75)" }}>List a business</Link>
           <Link href="/ask" style={{ color: "rgba(255,255,255,0.75)" }}>Ask Around You</Link>
@@ -35,7 +35,7 @@ export function HeroSection() {
               <input
                 type="text"
                 name="q"
-                placeholder="What do you need today? e.g. printer near Farin Gada, tailor in Rayfield..."
+                placeholder="What do you need today? e.g. printer, tailor, pharmacy..."
                 className="w-full h-9 pl-9 pr-4 text-sm rounded-sm outline-none"
                 style={{
                   background: "var(--bg-subtle)",
@@ -49,7 +49,7 @@ export function HeroSection() {
               className="h-9 px-4 text-sm font-medium text-white rounded-sm whitespace-nowrap"
               style={{ background: "var(--green)" }}
             >
-              Search Jos
+              Search
             </button>
           </form>
 

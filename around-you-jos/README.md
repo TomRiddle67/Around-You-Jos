@@ -162,4 +162,4 @@ Server Actions → Zod validation → Service layer → Database
 
 ## Neighborhoods Covered
 
-Farin Gada · Rayfield · Terminus · Bukuru · Anglo Jos · Dogon Dutse · Tudun Wada
+Millionaires Quarters (more neighborhoods coming soon)

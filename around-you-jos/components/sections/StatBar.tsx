@@ -1,14 +1,27 @@
 interface StatBarProps {
   businessCount: number;
   neighborhoodCount: number;
+  trustedPicksCount: number;
+  peopleHelpedCount: number;
 }
 
-export function StatBar({ businessCount, neighborhoodCount }: StatBarProps) {
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k+`;
+  if (n >= 50) return `${n}+`;
+  return `${n}`;
+}
+
+export function StatBar({
+  businessCount,
+  neighborhoodCount,
+  trustedPicksCount,
+  peopleHelpedCount,
+}: StatBarProps) {
   const stats = [
-    { value: `${businessCount}`,   label: "businesses" },
-    { value: `${neighborhoodCount}`, label: "neighborhoods" },
-    { value: "300+",               label: "trusted picks" },
-    { value: "2,400+",             label: "people helped" },
+    { value: `${businessCount}`,             label: "businesses" },
+    { value: `${neighborhoodCount}`,         label: "neighborhoods" },
+    { value: formatCount(trustedPicksCount), label: "trusted picks" },
+    { value: formatCount(peopleHelpedCount), label: "people helped" },
   ];
 
   return (

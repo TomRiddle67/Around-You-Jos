@@ -11,47 +11,15 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  // Neighborhoods
-  const farinGada = await prisma.neighborhood.upsert({
-    where:  { slug: "farin-gada" },
+  // Single neighborhood for now — Millionaires Quarters
+  const millionairesQuarters = await prisma.neighborhood.upsert({
+    where:  { slug: "millionaires-quarters" },
     update: {},
-    create: { name: "Farin Gada", slug: "farin-gada", description: "Student essentials, food, printing, and quick errands." },
-  });
-
-  const rayfield = await prisma.neighborhood.upsert({
-    where:  { slug: "rayfield" },
-    update: {},
-    create: { name: "Rayfield", slug: "rayfield", description: "Services, groceries, repairs, and everyday needs." },
-  });
-
-  const terminus = await prisma.neighborhood.upsert({
-    where:  { slug: "terminus" },
-    update: {},
-    create: { name: "Terminus", slug: "terminus", description: "Markets, city-center utilities, transport, and quick buys." },
-  });
-
-  const bukuru = await prisma.neighborhood.upsert({
-    where:  { slug: "bukuru" },
-    update: {},
-    create: { name: "Bukuru", slug: "bukuru", description: "Industry, local business, and a growing hospitality scene." },
-  });
-
-  const angloJos = await prisma.neighborhood.upsert({
-    where:  { slug: "anglo-jos" },
-    update: {},
-    create: { name: "Anglo Jos", slug: "anglo-jos", description: "Schools, churches, and established residential calm." },
-  });
-
-  const dogonDutse = await prisma.neighborhood.upsert({
-    where:  { slug: "dogon-dutse" },
-    update: {},
-    create: { name: "Dogon Dutse", slug: "dogon-dutse", description: "Growing neighborhood with everyday essentials and local character." },
-  });
-
-  const tudunWada = await prisma.neighborhood.upsert({
-    where:  { slug: "tudun-wada" },
-    update: {},
-    create: { name: "Tudun Wada", slug: "tudun-wada", description: "Residential area with markets and everyday services." },
+    create: {
+      name: "Millionaires Quarters",
+      slug: "millionaires-quarters",
+      description: "An upscale residential neighborhood with trusted local businesses and everyday services.",
+    },
   });
 
   // Categories
@@ -97,114 +65,96 @@ async function main() {
     create: { name: "Supermarket", slug: "supermarket", icon: "shopping-cart" },
   });
 
-  const hotel = await prisma.category.upsert({
-    where:  { slug: "hotel" },
-    update: {},
-    create: { name: "Hotel", slug: "hotel", icon: "building" },
-  });
-
-  // Businesses
+  // Placeholder businesses — all in Millionaires Quarters
+  // Swap these for real verified businesses once you have the data
   await prisma.business.upsert({
-    where:  { slug: "tasty-bites-terminus" },
+    where:  { slug: "mq-tasty-bites" },
     update: {},
     create: {
-      name: "Tasty Bites", slug: "tasty-bites-terminus",
-      description: "Affordable local meals with fast service near Terminus roundabout. Known for rice dishes and local soups.",
-      address: "12 Ahmadu Bello Way, Terminus, Jos",
+      name: "Tasty Bites", slug: "mq-tasty-bites",
+      description: "Affordable local meals with fast service. Known for rice dishes and local soups.",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348012345678", whatsapp: "+2348012345678",
-      isVerified: true, isFeatured: true,
-      neighborhoodId: terminus.id, categoryId: restaurant.id,
+      isVerified: false, isFeatured: true,
+      neighborhoodId: millionairesQuarters.id, categoryId: restaurant.id,
     },
   });
 
   await prisma.business.upsert({
-    where:  { slug: "quickprint-farin-gada" },
+    where:  { slug: "mq-quickprint" },
     update: {},
     create: {
-      name: "QuickPrint", slug: "quickprint-farin-gada",
-      description: "Fast document printing, scanning, and photocopying. Student-friendly prices.",
-      address: "45 College Road, Farin Gada, Jos",
+      name: "QuickPrint", slug: "mq-quickprint",
+      description: "Fast document printing, scanning, and photocopying.",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348023456789", whatsapp: "+2348023456789",
-      isVerified: true, isFeatured: false,
-      neighborhoodId: farinGada.id, categoryId: printing.id,
+      isVerified: false, isFeatured: false,
+      neighborhoodId: millionairesQuarters.id, categoryId: printing.id,
     },
   });
 
   await prisma.business.upsert({
-    where:  { slug: "rayfield-auto-repair" },
+    where:  { slug: "mq-auto-repair" },
     update: {},
     create: {
-      name: "Rayfield Auto Repair", slug: "rayfield-auto-repair",
-      description: "Trusted mechanics serving Rayfield and surrounding areas. Fair prices, honest work.",
-      address: "7 Rayfield Road, Rayfield, Jos",
+      name: "MQ Auto Repair", slug: "mq-auto-repair",
+      description: "Trusted mechanics serving the area. Fair prices, honest work.",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348034567890", whatsapp: "+2348034567890",
-      isVerified: true, isFeatured: true,
-      neighborhoodId: rayfield.id, categoryId: mechanic.id,
+      isVerified: false, isFeatured: true,
+      neighborhoodId: millionairesQuarters.id, categoryId: mechanic.id,
     },
   });
 
   await prisma.business.upsert({
-    where:  { slug: "jos-pharmacy-terminus" },
+    where:  { slug: "mq-pharmacy" },
     update: {},
     create: {
-      name: "Jos Central Pharmacy", slug: "jos-pharmacy-terminus",
+      name: "MQ Central Pharmacy", slug: "mq-pharmacy",
       description: "Well-stocked pharmacy with genuine drugs and knowledgeable staff.",
-      address: "3 Rwang Pam Street, Terminus, Jos",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348045678901", whatsapp: "+2348045678901",
-      isVerified: true, isFeatured: false,
-      neighborhoodId: terminus.id, categoryId: pharmacy.id,
+      isVerified: false, isFeatured: false,
+      neighborhoodId: millionairesQuarters.id, categoryId: pharmacy.id,
     },
   });
 
   await prisma.business.upsert({
-    where:  { slug: "stitch-king-rayfield" },
+    where:  { slug: "mq-stitch-king" },
     update: {},
     create: {
-      name: "Stitch King", slug: "stitch-king-rayfield",
-      description: "Quality tailoring for men and women. Native wear, suits, and alterations done with care.",
-      address: "15 Rayfield Road, Rayfield, Jos",
+      name: "Stitch King", slug: "mq-stitch-king",
+      description: "Quality tailoring for men and women. Native wear, suits, and alterations.",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348056789012", whatsapp: "+2348056789012",
-      isVerified: true, isFeatured: false,
-      neighborhoodId: rayfield.id, categoryId: tailoring.id,
+      isVerified: false, isFeatured: false,
+      neighborhoodId: millionairesQuarters.id, categoryId: tailoring.id,
     },
   });
 
   await prisma.business.upsert({
-    where:  { slug: "techfix-farin-gada" },
+    where:  { slug: "mq-techfix" },
     update: {},
     create: {
-      name: "TechFix", slug: "techfix-farin-gada",
-      description: "Phone and laptop repairs. Fast turnaround, genuine parts, student-friendly prices.",
-      address: "22 College Road, Farin Gada, Jos",
+      name: "TechFix", slug: "mq-techfix",
+      description: "Phone and laptop repairs. Fast turnaround, genuine parts.",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348067890123", whatsapp: "+2348067890123",
-      isVerified: true, isFeatured: false,
-      neighborhoodId: farinGada.id, categoryId: techRepair.id,
+      isVerified: false, isFeatured: false,
+      neighborhoodId: millionairesQuarters.id, categoryId: techRepair.id,
     },
   });
 
   await prisma.business.upsert({
-    where:  { slug: "bukuru-suya-spot" },
+    where:  { slug: "mq-supermart" },
     update: {},
     create: {
-      name: "Bukuru Suya Spot", slug: "bukuru-suya-spot",
-      description: "Famous suya and grilled meats. A local favourite for evening bites.",
-      address: "Old Airport Road, Bukuru, Jos",
-      phone: "+2348078901234", whatsapp: "+2348078901234",
-      isVerified: true, isFeatured: true,
-      neighborhoodId: bukuru.id, categoryId: restaurant.id,
-    },
-  });
-
-  await prisma.business.upsert({
-    where:  { slug: "anglo-supermart" },
-    update: {},
-    create: {
-      name: "Anglo Supermart", slug: "anglo-supermart",
+      name: "MQ Supermart", slug: "mq-supermart",
       description: "Well-stocked supermarket with groceries, beverages, and household items.",
-      address: "4 Anglo Jos Road, Anglo Jos, Jos",
+      address: "Millionaires Quarters, Jos",
       phone: "+2348089012345", whatsapp: "+2348089012345",
-      isVerified: true, isFeatured: false,
-      neighborhoodId: angloJos.id, categoryId: supermarket.id,
+      isVerified: false, isFeatured: false,
+      neighborhoodId: millionairesQuarters.id, categoryId: supermarket.id,
     },
   });
 

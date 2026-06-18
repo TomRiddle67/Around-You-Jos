@@ -21,12 +21,6 @@ interface NeighborhoodCardsProps {
   posts: SanityPost[];
 }
 
-const trustedPicks = [
-  { title: "3 tailors locals keep recommending", desc: "Quality stitching. On time. Fair prices.", tag: "Tailoring" },
-  { title: "2 quick laptop repair spots",        desc: "Fast turnaround. Trusted by many.",        tag: "Tech repair" },
-  { title: "A small business worth supporting",  desc: "Supporting local. Great service.",          tag: "Local biz" },
-];
-
 function SidebarSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-1">
@@ -134,7 +128,7 @@ export function NeighborhoodCards({ neighborhoods, categories, posts }: Neighbor
 
         {/* Neighborhoods grid */}
         <div className="mb-5">
-          <SectionHeader title="Explore by neighborhood" href="/neighborhoods" />
+          <SectionHeader title="Now live" href="/neighborhoods" />
           <div className="grid grid-cols-2 gap-px" style={{ background: "var(--border)" }}>
             {neighborhoods.map((n: { id: string; name: string; slug: string; description: string | null }) => (
               <Link
@@ -152,6 +146,18 @@ export function NeighborhoodCards({ neighborhoods, categories, posts }: Neighbor
                 <div className="text-xs mt-1" style={{ color: "var(--green)" }}>Explore →</div>
               </Link>
             ))}
+            <div
+              className="p-3 flex flex-col items-start justify-center"
+              style={{ background: "var(--bg-subtle)" }}
+            >
+              <div className="text-sm font-semibold mb-0.5" style={{ color: "var(--fg-muted)" }}>
+                More neighborhoods
+              </div>
+              <div className="text-xs" style={{ color: "var(--fg-subtle)" }}>
+                Coming soon — know an area we should cover?{" "}
+                <Link href="/ask" style={{ color: "var(--green)" }}>Tell us</Link>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -159,27 +165,6 @@ export function NeighborhoodCards({ neighborhoods, categories, posts }: Neighbor
         <div className="mb-5">
           <SectionHeader title="Useful now — local guides and places" href="/blog" />
           <PostsList posts={posts} />
-        </div>
-
-        {/* Trusted picks */}
-        <div className="mb-4">
-          <SectionHeader title="Trusted local picks" href="/blog" />
-          <div className="grid grid-cols-3 gap-px" style={{ background: "var(--border)" }}>
-            {trustedPicks.map((pick, i) => (
-              <div key={i} className="p-3" style={{ background: "var(--bg-surface)" }}>
-                <div className="text-sm font-semibold mb-1 cursor-pointer" style={{ color: "var(--fg)" }}>
-                  {pick.title}
-                </div>
-                <div className="text-xs mb-2" style={{ color: "var(--fg-muted)" }}>{pick.desc}</div>
-                <span
-                  className="text-xs px-1.5 py-0.5 rounded-sm"
-                  style={{ background: "var(--green-bg)", color: "var(--green-text)" }}
-                >
-                  {pick.tag}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
 
       </main>

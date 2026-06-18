@@ -146,7 +146,7 @@ export function AskForm({ neighborhoods }: AskFormProps) {
           <textarea
             name="description"
             rows={4}
-            placeholder="e.g. I need a reliable tailor who can make a suit in 3 days near Rayfield..."
+            placeholder="e.g. I need a reliable tailor who can make a suit in 3 days..."
             className="w-full pl-9 pr-4 py-2.5 text-sm rounded-md outline-none transition-all resize-none"
             style={inputStyle}
           />
