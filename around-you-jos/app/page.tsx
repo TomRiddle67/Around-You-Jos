@@ -10,7 +10,7 @@ import {
   getTrustedPicksCount,
   getPeopleHelpedCount,
 } from "@/lib/data/businesses";
-import { getRecentPosts } from "@/sanity/queries";
+import { getRecentPosts, type SanityPost } from "@/sanity/queries";
 
 export default async function HomePage() {
   const [neighborhoods, categories, businesses, posts, trustedPicksCount, peopleHelpedCount] =
@@ -18,7 +18,10 @@ export default async function HomePage() {
       getNeighborhoods(),
       getCategories(),
       getBusinesses(),
-      getRecentPosts(5),
+      getRecentPosts(5).catch((error): SanityPost[] => {
+        console.error("[HomePage] Failed to fetch Sanity posts:", error);
+        return [];
+      }),
       getTrustedPicksCount(),
       getPeopleHelpedCount(),
     ]);
