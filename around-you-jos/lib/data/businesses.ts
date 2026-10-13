@@ -111,6 +111,12 @@ export async function searchBusinesses(query: string) {
   return { businesses, neighborhoods };
 }
 
+export async function getActiveBusinessesCount(): Promise<number> {
+  return prisma.business.count({
+    where: { isActive: true },
+  });
+}
+
 export async function getTrustedPicksCount(): Promise<number> {
   return prisma.business.count({
     where: { isVerified: true, isActive: true },
@@ -120,3 +126,4 @@ export async function getTrustedPicksCount(): Promise<number> {
 export async function getPeopleHelpedCount(): Promise<number> {
   return prisma.serviceRequest.count();
 }
+

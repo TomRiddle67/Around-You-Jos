@@ -6,18 +6,18 @@ import { Footer } from "@/components/layout/Footer";
 import {
   getNeighborhoods,
   getCategories,
-  getBusinesses,
+  getActiveBusinessesCount,
   getTrustedPicksCount,
   getPeopleHelpedCount,
 } from "@/lib/data/businesses";
 import { getRecentPosts, type SanityPost } from "@/sanity/queries";
 
 export default async function HomePage() {
-  const [neighborhoods, categories, businesses, posts, trustedPicksCount, peopleHelpedCount] =
+  const [neighborhoods, categories, businessCount, posts, trustedPicksCount, peopleHelpedCount] =
     await Promise.all([
       getNeighborhoods(),
       getCategories(),
-      getBusinesses(),
+      getActiveBusinessesCount(),
       getRecentPosts(5).catch((error): SanityPost[] => {
         console.error("[HomePage] Failed to fetch Sanity posts:", error);
         return [];
@@ -31,7 +31,7 @@ export default async function HomePage() {
       <Navbar />
       <HeroSection />
       <StatBar
-        businessCount={businesses.length}
+        businessCount={businessCount}
         neighborhoodCount={neighborhoods.length}
         trustedPicksCount={trustedPicksCount}
         peopleHelpedCount={peopleHelpedCount}
