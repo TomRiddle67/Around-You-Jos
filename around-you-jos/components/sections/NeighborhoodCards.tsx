@@ -93,10 +93,20 @@ export function NeighborhoodCards({ neighborhoods, categories, posts }: Neighbor
         <div style={{ height: "0.5px", background: "var(--border)", margin: "6px 0" }} />
 
         <SidebarSection title="Quick links">
-          {["Featured businesses", "Recently added", "Local guides", "Trusted picks"].map((label: string) => (
-            <a key={label} className="block px-3 py-1 text-sm cursor-pointer" style={{ color: "var(--fg)" }}>
-              {label}
-            </a>
+          {[
+            { label: "All businesses", href: "/businesses" },
+            { label: "Neighborhoods", href: "/neighborhoods" },
+            { label: "Local guides", href: "/blog" },
+            { label: "Need something?", href: "/ask" },
+          ].map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block px-3 py-1 text-sm transition-colors hover:underline"
+              style={{ color: "var(--fg)" }}
+            >
+              {link.label}
+            </Link>
           ))}
         </SidebarSection>
       </aside>
@@ -114,7 +124,7 @@ export function NeighborhoodCards({ neighborhoods, categories, posts }: Neighbor
               Need something around Jos?
             </div>
             <div className="text-xs" style={{ color: "var(--fg-muted)" }}>
-              Tell us what you need — we'll help you find the right place or person.
+              Tell us what you need — we&apos;ll help you find the right place or person.
             </div>
           </div>
           <Link
