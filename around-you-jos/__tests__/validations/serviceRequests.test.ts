@@ -102,6 +102,75 @@ describe("serviceRequestSchema", () => {
         expect(result.error.flatten().fieldErrors.name).toBeDefined();
       }
     });
+
+    it("rejects whitespace-only name", () => {
+      const whitespaceCases = ["   ", " \t ", " \n\r\t "];
+      for (const name of whitespaceCases) {
+        const result = serviceRequestSchema.safeParse({
+          ...validPayload,
+          name,
+        });
+        expect(result.success, `Expected whitespace-only name "${name}" to be rejected`).toBe(false);
+        if (!result.success) {
+          expect(result.error.flatten().fieldErrors.name).toBeDefined();
+        }
+      }
+    });
+
+    it("normalizes valid name by trimming leading and trailing whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        name: "  Amina Ibrahim  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.name).toBe("Amina Ibrahim");
+      }
+    });
+
+    it("rejects name shorter than 2 characters after whitespace trimming", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        name: "  A  ",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.name).toBeDefined();
+      }
+    });
+
+    it("accepts name at minimum boundary of 2 characters with surrounding whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        name: "  Jo  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.name).toBe("Jo");
+      }
+    });
+
+    it("accepts name at maximum boundary of 100 characters with surrounding whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        name: "  " + "A".repeat(100) + "  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.name).toBe("A".repeat(100));
+      }
+    });
+
+    it("rejects name exceeding 100 characters after whitespace trimming", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        name: "  " + "A".repeat(101) + "  ",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.name).toBeDefined();
+      }
+    });
   });
 
   describe("phone field validation", () => {
@@ -160,6 +229,75 @@ describe("serviceRequestSchema", () => {
       const result = serviceRequestSchema.safeParse({
         ...validPayload,
         phone: "+234 801 234 5678 9999",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.phone).toBeDefined();
+      }
+    });
+
+    it("rejects whitespace-only phone", () => {
+      const whitespaceCases = ["   ", "          ", " \t \n "];
+      for (const phone of whitespaceCases) {
+        const result = serviceRequestSchema.safeParse({
+          ...validPayload,
+          phone,
+        });
+        expect(result.success, `Expected whitespace-only phone "${phone}" to be rejected`).toBe(false);
+        if (!result.success) {
+          expect(result.error.flatten().fieldErrors.phone).toBeDefined();
+        }
+      }
+    });
+
+    it("normalizes phone by trimming leading and trailing whitespace while preserving internal formatting", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        phone: "  +234 801 234 5678  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.phone).toBe("+234 801 234 5678");
+      }
+    });
+
+    it("rejects phone shorter than 10 characters after whitespace trimming", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        phone: "  0801234  ",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.phone).toBeDefined();
+      }
+    });
+
+    it("accepts phone at minimum boundary of 10 characters with surrounding whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        phone: "  0801234567  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.phone).toBe("0801234567");
+      }
+    });
+
+    it("accepts phone at maximum boundary of 20 characters with surrounding whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        phone: "  +234 (801) 123-45678  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.phone).toBe("+234 (801) 123-45678");
+      }
+    });
+
+    it("rejects phone exceeding 20 characters after whitespace trimming", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        phone: "  +234 801 234 5678 9999  ",
       });
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -262,6 +400,75 @@ describe("serviceRequestSchema", () => {
       const result = serviceRequestSchema.safeParse({
         ...validPayload,
         description: "D".repeat(501),
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.description).toBeDefined();
+      }
+    });
+
+    it("rejects whitespace-only description", () => {
+      const whitespaceCases = ["   ", "          ", " \t \n\r "];
+      for (const description of whitespaceCases) {
+        const result = serviceRequestSchema.safeParse({
+          ...validPayload,
+          description,
+        });
+        expect(result.success, "Expected whitespace-only description to be rejected").toBe(false);
+        if (!result.success) {
+          expect(result.error.flatten().fieldErrors.description).toBeDefined();
+        }
+      }
+    });
+
+    it("normalizes valid description by trimming leading and trailing whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        description: "   Looking for an experienced tailor for traditional attire.   ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.description).toBe("Looking for an experienced tailor for traditional attire.");
+      }
+    });
+
+    it("rejects description shorter than 10 characters after whitespace trimming", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        description: "   Need help   ",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.description).toBeDefined();
+      }
+    });
+
+    it("accepts description at minimum boundary of 10 characters with surrounding whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        description: "   0123456789   ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.description).toBe("0123456789");
+      }
+    });
+
+    it("accepts description at maximum boundary of 500 characters with surrounding whitespace", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        description: "  " + "D".repeat(500) + "  ",
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.description).toBe("D".repeat(500));
+      }
+    });
+
+    it("rejects description exceeding 500 characters after whitespace trimming", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        description: "  " + "D".repeat(501) + "  ",
       });
       expect(result.success).toBe(false);
       if (!result.success) {

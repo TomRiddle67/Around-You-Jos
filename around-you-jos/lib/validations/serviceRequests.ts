@@ -15,17 +15,20 @@ import { z } from "zod";
 export const serviceRequestSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name is too long"),
 
   phone: z
     .string()
+    .trim()
     .min(10, "Enter a valid phone number")
     .max(20, "Phone number is too long")
     .regex(/^[+\d\s()-]+$/, "Enter a valid phone number"),
 
   description: z
     .string()
+    .trim()
     .min(10, "Please describe what you need in more detail")
     .max(500, "Description is too long (max 500 characters)"),
 
