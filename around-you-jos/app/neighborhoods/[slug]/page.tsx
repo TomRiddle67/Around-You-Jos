@@ -3,7 +3,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { BusinessCard } from "@/components/business/BusinessCard";
-import { getNeighborhoodBySlug, getBusinesses, getCategories } from "@/lib/data/businesses";
+import {
+  getNeighborhoodBySlug,
+  getBusinesses,
+  getCategories,
+  parseDirectorySearchParams,
+} from "@/lib/data/businesses";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
@@ -43,14 +48,15 @@ export default async function NeighborhoodPage({
 }) {
   const { slug } = await params;
   const resolvedSearch = await searchParams;
-  const activeCategory =
-    typeof resolvedSearch.category === "string" ? resolvedSearch.category.trim() : undefined;
+  const { category: activeCategory } = parseDirectorySearchParams(
+    resolvedSearch as Record<string, unknown>
+  );
 
   const [neighborhood, businesses, categories] = await Promise.all([
     getNeighborhoodBySlug(slug),
     getBusinesses({
       neighborhood: slug,
-      category: activeCategory || undefined,
+      category: activeCategory,
     }),
     getCategories(),
   ]);

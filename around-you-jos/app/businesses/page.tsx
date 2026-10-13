@@ -2,7 +2,13 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { BusinessCard } from "@/components/business/BusinessCard";
-import { getBusinesses, getCategories, getNeighborhoods } from "@/lib/data/businesses";
+import {
+  getBusinesses,
+  getCategories,
+  getNeighborhoods,
+  buildDirectoryFilterUrl as buildFilterUrl,
+  parseDirectorySearchParams,
+} from "@/lib/data/businesses";
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { BusinessSummary } from "@/types";
@@ -31,31 +37,19 @@ export async function generateMetadata({
   };
 }
 
-function buildFilterUrl(params: { category?: string; neighborhood?: string }) {
-  const query = new URLSearchParams();
-  if (params.category) query.set("category", params.category);
-  if (params.neighborhood) query.set("neighborhood", params.neighborhood);
-  const qs = query.toString();
-  return qs ? `/businesses?${qs}` : "/businesses";
-}
-
 export default async function BusinessesPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
   const resolvedParams = await searchParams;
-  const activeCategory =
-    typeof resolvedParams.category === "string" ? resolvedParams.category.trim() : undefined;
-  const activeNeighborhood =
-    typeof resolvedParams.neighborhood === "string"
-      ? resolvedParams.neighborhood.trim()
-      : undefined;
+  const { category: activeCategory, neighborhood: activeNeighborhood } =
+    parseDirectorySearchParams(resolvedParams as Record<string, unknown>);
 
   const [businesses, categories, neighborhoods] = await Promise.all([
     getBusinesses({
-      category: activeCategory || undefined,
-      neighborhood: activeNeighborhood || undefined,
+      category: activeCategory,
+      neighborhood: activeNeighborhood,
     }),
     getCategories(),
     getNeighborhoods(),

@@ -1,22 +1,81 @@
 import { prisma } from "@/lib/prisma";
 import type { BusinessSummary } from "@/types";
 
+export type BusinessFilterParams = {
+  neighborhood?: string;
+  category?: string;
+  featured?: boolean;
+};
+
+/**
+ * Builds the Prisma `where` clause for business directory queries.
+ * Always guarantees `isActive: true` so inactive or unpublished businesses
+ * are never exposed, regardless of user input.
+ */
+export function buildBusinessWhereClause(filters?: BusinessFilterParams) {
+  const neighborhood =
+    typeof filters?.neighborhood === "string" && filters.neighborhood.trim().length > 0
+      ? filters.neighborhood.trim()
+      : undefined;
+  const category =
+    typeof filters?.category === "string" && filters.category.trim().length > 0
+      ? filters.category.trim()
+      : undefined;
+
+  return {
+    isActive: true,
+    ...(filters?.featured     && { isFeatured: true }),
+    ...(neighborhood          && { neighborhood: { slug: neighborhood } }),
+    ...(category              && { category:     { slug: category } }),
+  };
+}
+
+/**
+ * Parses and normalizes directory search parameters from URL query strings.
+ * Discards malformed (non-string), empty, or whitespace-only values,
+ * and ignores unsupported query keys.
+ */
+export function parseDirectorySearchParams(params?: Record<string, unknown>): {
+  category?: string;
+  neighborhood?: string;
+} {
+  const category =
+    typeof params?.category === "string" && params.category.trim().length > 0
+      ? params.category.trim()
+      : undefined;
+  const neighborhood =
+    typeof params?.neighborhood === "string" && params.neighborhood.trim().length > 0
+      ? params.neighborhood.trim()
+      : undefined;
+
+  return { category, neighborhood };
+}
+
+/**
+ * Builds consistent directory URLs while preserving existing active filters.
+ */
+export function buildDirectoryFilterUrl(params: {
+  category?: string;
+  neighborhood?: string;
+}): string {
+  const query = new URLSearchParams();
+  if (params.category && params.category.trim().length > 0) {
+    query.set("category", params.category.trim());
+  }
+  if (params.neighborhood && params.neighborhood.trim().length > 0) {
+    query.set("neighborhood", params.neighborhood.trim());
+  }
+  const qs = query.toString();
+  return qs ? `/businesses?${qs}` : "/businesses";
+}
+
 /**
  * Get all active businesses.
  * Optional filters: neighborhood slug, category slug, featured only.
  */
-export async function getBusinesses(filters?: {
-  neighborhood?: string;
-  category?: string;
-  featured?: boolean;
-}): Promise<BusinessSummary[]> {
+export async function getBusinesses(filters?: BusinessFilterParams): Promise<BusinessSummary[]> {
   const businesses = await prisma.business.findMany({
-    where: {
-      isActive: true,
-      ...(filters?.featured     && { isFeatured: true }),
-      ...(filters?.neighborhood && { neighborhood: { slug: filters.neighborhood } }),
-      ...(filters?.category     && { category:     { slug: filters.category } }),
-    },
+    where: buildBusinessWhereClause(filters),
     include: {
       neighborhood: { select: { name: true, slug: true } },
       category:     { select: { name: true, slug: true, icon: true } },
