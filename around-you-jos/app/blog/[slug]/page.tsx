@@ -14,7 +14,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostBySlug(slug).catch(() => null);
   if (!post) return { title: "Post Not Found" };
   return { title: post.title, description: post.excerpt };
 }
@@ -25,7 +25,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostBySlug(slug).catch(() => null);
   if (!post) notFound();
 
   const date = new Date(post.publishedAt).toLocaleDateString("en-NG", {
