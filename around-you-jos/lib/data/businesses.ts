@@ -130,10 +130,56 @@ export async function getNeighborhoodBySlug(slug: string) {
   });
 }
 
-export async function searchBusinesses(query: string) {
-  if (!query || query.trim().length < 2) return { businesses: [], neighborhoods: [] };
+export const MIN_SEARCH_QUERY_LENGTH = 2;
+export const MAX_SEARCH_QUERY_LENGTH = 100;
 
-  const term = query.trim();
+export type SearchQueryValidationResult =
+  | { isValid: true; query: string; reason?: never }
+  | { isValid: false; query: string; reason: "empty" | "too_short" | "too_long" };
+
+/**
+ * Validates and normalizes user-supplied search queries.
+ *
+ * Enforces:
+ * - Safe handling of null, undefined, strings, and string arrays (extracts first param).
+ * - Trimming of leading and trailing whitespace.
+ * - Rejection of empty or whitespace-only queries.
+ * - Minimum search query length of 2 characters.
+ * - Maximum search query length of 100 characters (safely rejected, never silently truncated).
+ */
+export function validateSearchQuery(rawQuery: unknown): SearchQueryValidationResult {
+  let queryStr: string;
+
+  if (Array.isArray(rawQuery)) {
+    queryStr = typeof rawQuery[0] === "string" ? rawQuery[0] : "";
+  } else if (typeof rawQuery === "string") {
+    queryStr = rawQuery;
+  } else {
+    return { isValid: false, query: "", reason: "empty" };
+  }
+
+  const trimmed = queryStr.trim();
+
+  if (trimmed.length === 0) {
+    return { isValid: false, query: "", reason: "empty" };
+  }
+
+  if (trimmed.length < MIN_SEARCH_QUERY_LENGTH) {
+    return { isValid: false, query: trimmed, reason: "too_short" };
+  }
+
+  if (trimmed.length > MAX_SEARCH_QUERY_LENGTH) {
+    return { isValid: false, query: trimmed, reason: "too_long" };
+  }
+
+  return { isValid: true, query: trimmed };
+}
+
+export async function searchBusinesses(query: string) {
+  const validation = validateSearchQuery(query);
+  if (!validation.isValid) return { businesses: [], neighborhoods: [] };
+
+  const term = validation.query;
 
   const [businesses, neighborhoods] = await Promise.all([
     prisma.business.findMany({

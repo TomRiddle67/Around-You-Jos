@@ -2,7 +2,11 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { BusinessCard } from "@/components/business/BusinessCard";
-import { searchBusinesses } from "@/lib/data/businesses";
+import {
+  searchBusinesses,
+  validateSearchQuery,
+  MAX_SEARCH_QUERY_LENGTH,
+} from "@/lib/data/businesses";
 import Link from "next/link";
 import { MapPin, Search } from "lucide-react";
 import type { Metadata } from "next";
@@ -11,25 +15,29 @@ import type { BusinessSummary } from "@/types";
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string | string[] }>;
 }): Promise<Metadata> {
   const { q } = await searchParams;
+  const validation = validateSearchQuery(q);
+
   return {
-    title: q ? `Search: ${q}` : "Search",
-    description: `Search results for "${q}" in Jos, Nigeria.`,
+    title: validation.isValid ? `Search: ${validation.query}` : "Search",
+    description: validation.isValid
+      ? `Search results for "${validation.query}" in Jos, Nigeria.`
+      : "Search local businesses, neighborhoods, and services in Jos, Plateau State.",
   };
 }
 
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string | string[] }>;
 }) {
   const { q } = await searchParams;
-  const query = q?.trim() ?? "";
+  const validation = validateSearchQuery(q);
 
-  const { businesses, neighborhoods } = query.length >= 2
-    ? await searchBusinesses(query)
+  const { businesses, neighborhoods } = validation.isValid
+    ? await searchBusinesses(validation.query)
     : { businesses: [], neighborhoods: [] };
 
   const totalResults = businesses.length + neighborhoods.length;
@@ -59,7 +67,8 @@ export default async function SearchPage({
                 <input
                   type="text"
                   name="q"
-                  defaultValue={query}
+                  defaultValue={validation.query}
+                  maxLength={MAX_SEARCH_QUERY_LENGTH}
                   placeholder="Search businesses, neighborhoods, services..."
                   className="w-full h-9 pl-9 pr-4 text-sm rounded-sm outline-none"
                   style={{
@@ -78,10 +87,10 @@ export default async function SearchPage({
               </button>
             </form>
 
-            {query.length >= 2 && (
+            {validation.isValid && (
               <p className="text-xs" style={{ color: "var(--fg-muted)" }}>
                 {totalResults} result{totalResults !== 1 ? "s" : ""} for{" "}
-                <span style={{ color: "var(--fg)" }}>"{query}"</span>
+                <span style={{ color: "var(--fg)" }}>&quot;{validation.query}&quot;</span>
               </p>
             )}
           </Container>
@@ -89,7 +98,19 @@ export default async function SearchPage({
 
         <div style={{ background: "var(--bg)" }} className="py-6">
           <Container>
-            {query.length < 2 ? (
+            {!validation.isValid && validation.reason === "too_long" ? (
+              <div className="py-20 text-center">
+                <p className="text-sm mb-2 font-medium" style={{ color: "var(--fg)" }}>
+                  Your search is too long. Please use 100 characters or fewer.
+                </p>
+                <p className="text-xs" style={{ color: "var(--fg-subtle)" }}>
+                  Try a shorter search term or{" "}
+                  <Link href="/ask" style={{ color: "var(--green)" }}>
+                    ask us directly →
+                  </Link>
+                </p>
+              </div>
+            ) : !validation.isValid ? (
               <div className="py-20 text-center">
                 <p className="text-sm" style={{ color: "var(--fg-muted)" }}>
                   Enter at least 2 characters to search.
@@ -98,7 +119,7 @@ export default async function SearchPage({
             ) : totalResults === 0 ? (
               <div className="py-20 text-center">
                 <p className="text-sm mb-2" style={{ color: "var(--fg-muted)" }}>
-                  No results found for "{query}"
+                  No results found for &quot;{validation.query}&quot;
                 </p>
                 <p className="text-xs" style={{ color: "var(--fg-subtle)" }}>
                   Try a different search term or{" "}
