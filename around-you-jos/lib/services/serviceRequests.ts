@@ -14,7 +14,7 @@ import { checkRateLimit, RATE_LIMIT_CONFIG } from "@/lib/security/rateLimit";
  */
 
 export interface ServiceRequestContext {
-  clientIp?: string;
+  clientIp?: string | null;
 }
 
 export type ServiceRequestResult =
@@ -26,20 +26,25 @@ export async function submitServiceRequest(
   input: unknown,
   context?: ServiceRequestContext
 ): Promise<ServiceRequestResult> {
-  // 1. IP-level rate limiting check (mitigates automated submission spikes per connection)
-  const clientIp = context?.clientIp || "anonymous";
-  const ipCheck = await checkRateLimit({
-    action: "service_request_ip",
-    identifier: clientIp,
-    limit: RATE_LIMIT_CONFIG.MAX_REQUESTS_PER_IP,
-    windowMs: RATE_LIMIT_CONFIG.WINDOW_MS,
-  });
+  // 1. IP-level rate limiting check (mitigates automated submission spikes per verified IP)
+  // When a verified client IP is available, enforce connection-level rate limiting.
+  // If no trustworthy IP is present (null or "anonymous"), we do not enforce a shared bucket,
+  // ensuring one visitor cannot exhaust the submission quota for all other visitors.
+  const clientIp = context?.clientIp?.trim();
+  if (clientIp && clientIp !== "anonymous") {
+    const ipCheck = await checkRateLimit({
+      action: "service_request_ip",
+      identifier: clientIp,
+      limit: RATE_LIMIT_CONFIG.MAX_REQUESTS_PER_IP,
+      windowMs: RATE_LIMIT_CONFIG.WINDOW_MS,
+    });
 
-  if (!ipCheck.success) {
-    return {
-      success: false,
-      message: "Too many requests from your connection. Please wait a few minutes before trying again.",
-    };
+    if (!ipCheck.success) {
+      return {
+        success: false,
+        message: "Too many requests from your connection. Please wait a few minutes before trying again.",
+      };
+    }
   }
 
   // 2. Validate input schema

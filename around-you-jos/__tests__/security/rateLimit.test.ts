@@ -3,6 +3,7 @@ import {
   checkRateLimit,
   hashIdentifier,
   pruneExpiredRateLimits,
+  resetPruneStateForTesting,
   RATE_LIMIT_CONFIG,
 } from "@/lib/security/rateLimit";
 import { prisma } from "@/lib/prisma";
@@ -19,6 +20,7 @@ vi.mock("@/lib/prisma", () => ({
 describe("Distributed Rate Limiter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetPruneStateForTesting();
     vi.mocked(prisma.rateLimitBucket.deleteMany).mockResolvedValue({ count: 0 });
   });
 
@@ -234,8 +236,22 @@ describe("Distributed Rate Limiter", () => {
         new Error("Database write locked")
       );
 
-      const deletedCount = await pruneExpiredRateLimits();
+      const deletedCount = await pruneExpiredRateLimits(true);
       expect(deletedCount).toBe(0);
+    });
+
+    it("throttles successive prune invocations to prevent database stampedes", async () => {
+      vi.mocked(prisma.rateLimitBucket.deleteMany).mockResolvedValue({ count: 5 });
+
+      // First run succeeds and updates lastPrunedAt
+      const first = await pruneExpiredRateLimits(true);
+      expect(first).toBe(5);
+      expect(prisma.rateLimitBucket.deleteMany).toHaveBeenCalledTimes(1);
+
+      // Immediate second unforced run should be throttled and return 0 without hitting the DB
+      const second = await pruneExpiredRateLimits(false);
+      expect(second).toBe(0);
+      expect(prisma.rateLimitBucket.deleteMany).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -246,5 +262,12 @@ describe("Distributed Rate Limiter", () => {
       expect(RATE_LIMIT_CONFIG.MAX_REQUESTS_PER_PHONE).toBeGreaterThan(0);
       expect(RATE_LIMIT_CONFIG.SALT).toBeDefined();
     });
+
+    it("falls back to default salt if whitespace-only salt is provided to hashIdentifier", () => {
+      const defaultHash = hashIdentifier("test-id", RATE_LIMIT_CONFIG.SALT);
+      const whitespaceSaltHash = hashIdentifier("test-id", "   ");
+      expect(whitespaceSaltHash).toBe(defaultHash);
+    });
   });
 });
+

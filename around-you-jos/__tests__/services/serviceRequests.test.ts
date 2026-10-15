@@ -170,4 +170,32 @@ describe("submitServiceRequest with Rate Limiting", () => {
       expect(result.message).toBe("Something went wrong. Please try again.");
     }
   });
+
+  it("safely skips IP rate limit and allows submission when clientIp is null or anonymous without locking out visitors", async () => {
+    // Only phone rate limit should be checked (1 upsert call)
+    vi.mocked(prisma.rateLimitBucket.upsert).mockResolvedValueOnce({
+      key: "phone-key",
+      count: 1,
+      expiresAt: new Date(Date.now() + 600000),
+    });
+    vi.mocked(createServiceRequest).mockResolvedValueOnce({
+      id: "req-anon",
+      name: validPayload.name,
+      phone: validPayload.phone,
+      description: validPayload.description,
+      status: "PENDING",
+      createdAt: new Date(),
+      neighborhoodId: validPayload.neighborhoodId,
+    });
+
+    const result = await submitServiceRequest(validPayload, {
+      clientIp: null,
+    });
+
+    expect(result.success).toBe(true);
+    // Verifies that only the phone rate limit bucket was touched, NOT an anonymous IP bucket
+    expect(prisma.rateLimitBucket.upsert).toHaveBeenCalledTimes(1);
+    expect(createServiceRequest).toHaveBeenCalledTimes(1);
+  });
 });
+
