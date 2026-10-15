@@ -1,11 +1,14 @@
 "use server";
 
 import { submitServiceRequest } from "@/lib/services/serviceRequests";
+import { getClientIp } from "@/lib/security/clientIp";
 
 export async function submitRequestAction(
   _prevState: unknown,
   formData: FormData
 ) {
+  const clientIp = await getClientIp();
+
   const input = {
     name:           formData.get("name"),
     phone:          formData.get("phone"),
@@ -13,5 +16,5 @@ export async function submitRequestAction(
     neighborhoodId: formData.get("neighborhoodId") || undefined,
   };
 
-  return submitServiceRequest(input);
+  return submitServiceRequest(input, { clientIp });
 }

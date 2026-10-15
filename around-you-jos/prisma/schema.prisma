@@ -81,3 +81,11 @@ enum ServiceRequestStatus {
   SEEN
   RESOLVED
 }
+
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
