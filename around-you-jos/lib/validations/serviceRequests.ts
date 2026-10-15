@@ -34,6 +34,10 @@ export const serviceRequestSchema = z.object({
 
   neighborhoodId: z
     .string()
+    .trim()
+    .min(1, "Please select a valid neighborhood")
+    .max(50, "Invalid neighborhood identifier")
+    .regex(/^[a-zA-Z0-9_-]+$/, "Invalid neighborhood identifier")
     .optional(),
 });
 

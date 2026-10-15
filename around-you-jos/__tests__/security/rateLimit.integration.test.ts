@@ -57,7 +57,7 @@ describe.runIf(hasDb)("Real PostgreSQL Rate Limiter Integration", () => {
     });
 
     expect(rows).toHaveLength(1);
-    expect(rows[0].count).toBe(10);
+    expect(rows[0]?.count).toBe(10);
   });
 
   it("prunes expired buckets from real PostgreSQL without affecting active buckets", async () => {

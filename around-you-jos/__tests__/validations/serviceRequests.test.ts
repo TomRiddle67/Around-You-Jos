@@ -489,12 +489,134 @@ describe("serviceRequestSchema", () => {
       }
     });
 
-    it("accepts valid string neighborhoodId", () => {
+    it("rejects empty string neighborhoodId", () => {
       const result = serviceRequestSchema.safeParse({
         ...validPayload,
-        neighborhoodId: "millionaires-quarters-id",
+        neighborhoodId: "",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.neighborhoodId).toBeDefined();
+        expect(result.error.flatten().fieldErrors.neighborhoodId?.[0]).toContain("valid neighborhood");
+      }
+    });
+
+    it("rejects whitespace-only neighborhoodId", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: "   ",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.neighborhoodId).toBeDefined();
+      }
+    });
+
+    it("rejects malformed neighborhoodId containing spaces", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: "millionaires quarters 123",
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.neighborhoodId?.[0]).toContain("Invalid neighborhood identifier");
+      }
+    });
+
+    it("rejects malicious or injection characters in neighborhoodId", () => {
+      const malicious = [
+        "<script>alert('xss')</script>",
+        "cuid'; DROP TABLE \"Neighborhood\";--",
+        "cuid/../etc/passwd",
+        "cuid$1",
+        "cuid@area",
+      ];
+
+      for (const id of malicious) {
+        const result = serviceRequestSchema.safeParse({
+          ...validPayload,
+          neighborhoodId: id,
+        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          expect(result.error.flatten().fieldErrors.neighborhoodId).toBeDefined();
+        }
+      }
+    });
+
+    it("rejects excessively long neighborhoodId exceeding 50 characters", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: "a".repeat(51),
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.flatten().fieldErrors.neighborhoodId?.[0]).toContain("Invalid neighborhood identifier");
+      }
+    });
+
+    it("accepts valid boundary lengths (1 character and 50 characters)", () => {
+      const minBoundary = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: "a",
+      });
+      expect(minBoundary.success).toBe(true);
+
+      const maxBoundary = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: "a".repeat(50),
+      });
+      expect(maxBoundary.success).toBe(true);
+    });
+
+    it("accepts valid CUID and slug-based identifiers", () => {
+      const validIds = [
+        "millionaires-quarters-id",
+        "neighborhood-cuid-123",
+        "clh1234567890abcdefghijkl",
+        "area_456_north",
+      ];
+
+      for (const id of validIds) {
+        const result = serviceRequestSchema.safeParse({
+          ...validPayload,
+          neighborhoodId: id,
+        });
+        expect(result.success).toBe(true);
+      }
+    });
+
+    it("normalizes surrounding whitespace on valid identifiers", () => {
+      const result = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: "  cuid-valid-123  ",
       });
       expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.neighborhoodId).toBe("cuid-valid-123");
+      }
+    });
+
+    it("accepts payload when neighborhoodId is omitted or undefined", () => {
+      const omitted = {
+        name: validPayload.name,
+        phone: validPayload.phone,
+        description: validPayload.description,
+      };
+      const res1 = serviceRequestSchema.safeParse(omitted);
+      expect(res1.success).toBe(true);
+      if (res1.success) {
+        expect(res1.data.neighborhoodId).toBeUndefined();
+      }
+
+      const res2 = serviceRequestSchema.safeParse({
+        ...validPayload,
+        neighborhoodId: undefined,
+      });
+      expect(res2.success).toBe(true);
+      if (res2.success) {
+        expect(res2.data.neighborhoodId).toBeUndefined();
+      }
     });
   });
 });

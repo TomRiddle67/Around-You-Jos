@@ -86,6 +86,30 @@ describe("submitServiceRequest with Rate Limiting", () => {
     expect(createServiceRequest).not.toHaveBeenCalled();
   });
 
+  it("rejects submission and avoids creating records when neighborhoodId is malformed or invalid", async () => {
+    // Under IP rate limit
+    vi.mocked(prisma.rateLimitBucket.upsert).mockResolvedValue({
+      key: "test-key",
+      count: 1,
+      expiresAt: new Date(Date.now() + 600000),
+    });
+
+    const malformedPayload = {
+      ...validPayload,
+      neighborhoodId: "<script>alert('xss')</script>",
+    };
+
+    const result = await submitServiceRequest(malformedPayload, {
+      clientIp: "192.168.1.100",
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success && "errors" in result) {
+      expect(result.errors.neighborhoodId).toBeDefined();
+    }
+    expect(createServiceRequest).not.toHaveBeenCalled();
+  });
+
   it("blocks submission and avoids creating records when IP rate limit is exceeded", async () => {
     // First upsert call is for IP check -> return count 6 (limit is 5)
     vi.mocked(prisma.rateLimitBucket.upsert).mockResolvedValueOnce({
